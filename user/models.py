@@ -7,31 +7,6 @@ from django.contrib.auth.models import (
 )
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
-    """
-    Custom User Model for the Django Application.
-    Needed to create this as we need email field.
-    """
-
-    username = models.CharField(max_length=90, unique=True)
-    # I you want to create different account from same email, set the value to false.
-    email = models.CharField(max_length=255, unique=True)
-    is_staff = models.BooleanField(default=False)
-    is_verified = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    objects = CustomUserManager()
-
-    REQUIRED_FIELDS = ['email']
-
-    def __str__(self):
-        """
-        Returns User's id and username
-        """
-        return f"{self.id} | {self.username}"
-
-
 class CustomUserManager(BaseUserManager):
     """
     Custom User Manager for Custom User Profile
@@ -80,3 +55,29 @@ class CustomUserManager(BaseUserManager):
         user.save()
 
         return user
+
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    """
+    Custom User Model for the Django Application.
+    Needed to create this as we need email field.
+    """
+
+    username = models.CharField(max_length=90, unique=True)
+    # I you want to create different account from same email, set the value to false.
+    email = models.CharField(max_length=255, unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    def __str__(self):
+        """
+        Returns User's id and username
+        """
+        return f"{self.id} | {self.username}"
