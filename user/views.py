@@ -33,4 +33,12 @@ class UserRegistrationView(generics.GenericAPIView):
                 'message': 'Accont Created',
                 'response': currentUserData
             })
-
+        else:
+            message = 'Invalid'
+            if "errors" in serializer._errors:
+                message = serializer._errors['errors'][0]
+            return response.Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': message,
+                'response': serializer.errors,
+            }, status=status.HTTP_400_BAD_REQUEST)

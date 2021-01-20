@@ -44,6 +44,8 @@ INSTALLED_APPS = [
 # Rest Framework Configuration
 # Using simplejwt instead of default provided by restframework
 REST_FRAMEWORK = {
+    'NON_FIELD_ERRORS_KEY': 'errors',
+    'EXCEPTION_HANDLER': 'user_auth_api.utils.custom_exception_handler',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
