@@ -1,3 +1,17 @@
-from django.shortcuts import render
+# External Import
+from rest_framework import generics
 
-# Create your views here.
+# Internal Import
+from . import serializers
+
+class UserRegistrationView(generics.GenericAPIView):
+    """
+    A Generic API View to register new User
+    """
+
+    serializer_class = serializers.UserRegistrationSerializer
+
+    def post(self,request):
+        """
+        Post Request for User Registration
+        """
