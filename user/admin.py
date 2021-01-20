@@ -1,3 +1,7 @@
+# External Import
 from django.contrib import admin
 
-# Register your models here.
+# Internal Import
+from user.models import CustomUser
+
+admin.site.register(CustomUser)
