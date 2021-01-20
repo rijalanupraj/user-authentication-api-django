@@ -36,3 +36,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             })
 
         return attrs
+
+        def create(self, validated_data):
+            """
+            Writing Custom Code to create User Instance
+            """
+            user = models.CustomUser.objects.create_user(
+                username=validated_data['username'],
+                email=validated_data['email'],
+                password=validated_data['password'],
+            )
+
+            return user
