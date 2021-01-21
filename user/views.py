@@ -42,3 +42,28 @@ class UserRegistrationView(generics.GenericAPIView):
                 'message': message,
                 'response': serializer.errors,
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLoginAPIView(generics.GenericAPIView):
+    """
+    A Generic API View to login
+    """
+    serializer_class = serializers.UserLoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            return response.Response({
+                'status': status.HTTP_200_OK,
+                'message': 'Logged In Successful',
+                'response': serializer.data,
+            }, status=status.HTTP_200_OK)
+        else:
+            message = 'Invalid'
+            if "errors" in serializer._errors:
+                message = serializer._errors['errors'][0]
+            return response.Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': message,
+                'response': serializer.errors,
+            }, status=status.HTTP_400_BAD_REQUEST)

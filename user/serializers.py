@@ -1,5 +1,7 @@
 # External Import
 from rest_framework import serializers
+from django.contrib import auth
+
 
 # Internal Import
 from . import models
@@ -48,3 +50,62 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             )
 
             return user
+
+
+class UserLoginSerializer(serializers.ModelSerializer):
+    """
+    Serializer to Login User
+    You can login in by using either email
+    or password
+    """
+    username = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+
+    class Meta:
+        model = models.User
+        fields = ['email', 'username', 'password']
+        extra_kwargs = {
+            'password': {
+                'write_only': True,
+                'style': {'input_type': 'password'}
+            },
+        }
+
+    def validate(self, attrs):
+        """
+        Validating the User loging credentials
+        """
+        username = attrs.get('username', '')
+        password = attrs.get('password', '')
+        email = attrs.get('email', '')
+        if username == "" and email == "":
+
+            raise serializers.ValidationError(
+                {"errors": "Both username and email cannot be null"})
+        if username != "" and email != "":
+
+            current_user = auth.authenticate(
+                username=username, password=password)
+        elif username != "":
+
+            current_user = auth.authenticate(
+                username=username, password=password)
+        elif email != "":
+
+            try:
+                username = models.User.objects.get(email=email).username
+            except:
+                raise serializers.ValidationError('Invalid Credentials')
+            current_user = auth.authenticate(
+                username=username, password=password)
+
+        if not current_user:
+            raise serializers.ValidationError('Invalid Credentials')
+
+        if not current_user.is_verified:
+            raise serializers.ValidationError('Account Not Verified')
+
+        return {
+            'username': current_user.username,
+            'email': current_user.email,
+        }
