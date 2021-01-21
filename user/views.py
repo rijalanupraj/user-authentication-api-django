@@ -43,7 +43,7 @@ class UserRegistrationView(generics.GenericAPIView):
             email_body = f"Namaste {user.username}\n Use link below to verify your account.\n{absolute_url}"
             email_message = {
                 'email_body': email_body,
-                'email_subject': "Verify Your Email For SlicedTv Account",
+                'email_subject': "Verify Your Email",
                 'to_email': user.email
             }
             # Sending from utils.py file
