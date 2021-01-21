@@ -60,11 +60,22 @@ class UserLoginSerializer(serializers.ModelSerializer):
     """
     username = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(required=False, allow_blank=True)
+    tokens = serializers.SerializerMethodField()
+
+    def get_tokens(self, obj):
+        current_user = models.User.objects.get(username=obj['username'])
+        return {
+            'access': current_user.tokens()['access'],
+            'refresh': current_user.tokens()['refresh']
+        }
 
     class Meta:
         model = models.User
-        fields = ['email', 'username', 'password']
+        fields = ['email', 'tokens', 'username', 'password']
         extra_kwargs = {
+            'tokens': {
+                'read_only': True,
+            },
             'password': {
                 'write_only': True,
                 'style': {'input_type': 'password'}
@@ -108,4 +119,5 @@ class UserLoginSerializer(serializers.ModelSerializer):
         return {
             'username': current_user.username,
             'email': current_user.email,
+            'tokens': current_user.tokens,
         }
