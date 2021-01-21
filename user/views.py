@@ -1,9 +1,13 @@
 # External Import
 from rest_framework import generics, response, status
+from django.urls import reverse
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.sites.shortcuts import get_current_site
 
 # Internal Import
 from . import serializers
 from . import models
+from .utils import Util
 
 
 class UserRegistrationView(generics.GenericAPIView):
@@ -26,6 +30,24 @@ class UserRegistrationView(generics.GenericAPIView):
         if serializer.is_valid():
             serializer.save()  # Saving the data to database
             currentUserData = serializer.data
+
+            user = models.User.objects.get(email=currentUserData['email'])
+
+            # Token
+            token = str(RefreshToken().for_user(user).access_token)
+
+            # Sending Verification URL to the current_user
+            current_site = get_current_site(request)
+            relative_link = reverse('verify-email')
+            absolute_url = f"http://{current_site}{relative_link}?token={token}"
+            email_body = f"Namaste {user.username}\n Use link below to verify your account.\n{absolute_url}"
+            email_message = {
+                'email_body': email_body,
+                'email_subject': "Verify Your Email For SlicedTv Account",
+                'to_email': user.email
+            }
+            # Sending from utils.py file
+            Util.send_email(email_message)
 
             # Returning custom response while user is Created & Saved in Database
             return response.Response({
