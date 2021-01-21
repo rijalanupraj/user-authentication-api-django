@@ -2,6 +2,6 @@
 from django.contrib import admin
 
 # Internal Import
-from user.models import CustomUser
+from user.models import User
 
-admin.site.register(CustomUser)
+admin.site.register(User)

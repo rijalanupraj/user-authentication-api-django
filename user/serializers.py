@@ -14,7 +14,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=20, min_length=4)
 
     class Meta:
-        model = models.CustomUser
+        model = models.User
         fields = ('id', 'username', 'email', 'password')
 
     def validate(self, attrs):
@@ -41,7 +41,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             """
             Writing Custom Code to create User Instance
             """
-            user = models.CustomUser.objects.create_user(
+            user = models.User.objects.create_user(
                 username=validated_data['username'],
                 email=validated_data['email'],
                 password=validated_data['password'],

@@ -7,7 +7,7 @@ from django.contrib.auth.models import (
 )
 
 
-class CustomUserManager(BaseUserManager):
+class UserManager(BaseUserManager):
     """
     Custom User Manager for Custom User Profile
     """
@@ -57,7 +57,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     """
     Custom User Model for the Django Application.
     Needed to create this as we need email field.
@@ -71,7 +71,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    objects = CustomUserManager()
+    objects = UserManager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
