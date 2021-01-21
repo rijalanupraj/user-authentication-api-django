@@ -3,6 +3,9 @@ from rest_framework import generics, response, status
 from django.urls import reverse
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.sites.shortcuts import get_current_site
+import jwt
+from django.conf import settings
+import os
 
 # Internal Import
 from . import serializers
@@ -38,7 +41,7 @@ class UserRegistrationView(generics.GenericAPIView):
 
             # Sending Verification URL to the current_user
             current_site = get_current_site(request)
-            relative_link = reverse('verify-email')
+            relative_link = reverse('user-verify-email')
             absolute_url = f"http://{current_site}{relative_link}?token={token}"
             email_body = f"Namaste {user.username}\n Use link below to verify your account.\n{absolute_url}"
             email_message = {
@@ -88,4 +91,43 @@ class UserLoginAPIView(generics.GenericAPIView):
                 'status': status.HTTP_400_BAD_REQUEST,
                 'message': message,
                 'response': serializer.errors,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyEmail(generics.GenericAPIView):
+    """ Verifying User Email"""
+
+    def get(self, request):
+        """ GET method which takes token which was sent to the user's email after registration """
+
+        token = request.GET.get('token')
+
+        try:
+            # Working with received token
+            received_token = jwt.decode(token, settings.SECRET_KEY)
+            user = models.User.objects.get(id=received_token['user_id'])
+
+            # Changing User status to verified
+            if not user.is_verified:
+                user.is_verified = True
+                user.save()
+
+            message = 'Email Successfully Activated'
+            response_message = {'status': status.HTTP_200_OK,
+                                'message': message, 'response': {"detail": "Username Successfully Activated"}}
+            return response.Response(response_message, status=status.HTTP_200_OK)
+
+        except jwt.ExpiredSignatureError as identifier:
+            return response.Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': 'Activation Link Expired',
+                'response': {"errors": "Activation Link Expired"}
+            }, status=status.HTTP_400_BAD_REQUEST)
+            # ! Should send the user another activation link by asking the user.
+
+        except:
+            return response.Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': 'Invalid Activation Link',
+                'response': {"errors": "Invalid Activation Link"}
             }, status=status.HTTP_400_BAD_REQUEST)
